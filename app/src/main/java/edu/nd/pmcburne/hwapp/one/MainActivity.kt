@@ -55,6 +55,11 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.IconButton
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.GlobalScope
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,14 +116,56 @@ fun ScoreboardScreen(repository: GameRepo) {
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    OutlinedButton(
-                        onClick = { showDatePicker = true },
-                        modifier = Modifier.fillMaxWidth()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(Icons.Default.DateRange, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text("Date: ${selectedDate.format(DateTimeFormatter.ofLocalizedDate(
-                            FormatStyle.MEDIUM))}")
+
+                        OutlinedButton(
+                            onClick = { showDatePicker = true },
+                            //modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.weight(1f)
+
+                        ) {
+                            Icon(Icons.Default.DateRange, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                "Date: ${
+                                    selectedDate.format(
+                                        DateTimeFormatter.ofLocalizedDate(
+                                            FormatStyle.MEDIUM
+                                        )
+                                    )
+                                }"
+                            )
+                        }
+
+                        IconButton(
+                            onClick = {
+                                // We manually trigger the refresh here
+                                isLoading = true
+                                // We use a coroutine scope to call the suspend function manually
+                                // Or simply let the LaunchedEffect handle it by "nudging" a state
+                                // But the cleanest way is to just call refreshGames:
+                                kotlinx.coroutines.GlobalScope.launch {
+                                    repository.refreshGames(
+                                        gender,
+                                        selectedDate.year.toString(),
+                                        selectedDate.monthValue.toString().padStart(2, '0'),
+                                        selectedDate.dayOfMonth.toString().padStart(2, '0')
+                                    )
+                                    isLoading = false
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Refresh",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
                     }
 
                     Spacer(Modifier.height(8.dp))
