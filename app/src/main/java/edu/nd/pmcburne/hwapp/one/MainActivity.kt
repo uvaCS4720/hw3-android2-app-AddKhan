@@ -15,7 +15,10 @@ import androidx.compose.ui.Modifier
 import edu.nd.pmcburne.hwapp.one.ui.theme.HWStarterRepoTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
@@ -38,6 +41,21 @@ import edu.nd.pmcburne.hwapp.one.data.repository.GameRepo
 import java.time.LocalDate
 import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +83,7 @@ class MainActivity : ComponentActivity() {
 fun ScoreboardScreen(repository: GameRepo) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var gender by remember { mutableStateOf("men") }
+    var showDatePicker by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
     val dateString = selectedDate.toString()
@@ -84,8 +103,47 @@ fun ScoreboardScreen(repository: GameRepo) {
     Scaffold(
         topBar = {
             Column {
-                // TODO: add date picker button
-                // TODO: add switch button for gender
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedButton(
+                        onClick = { showDatePicker = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.DateRange, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Date: ${selectedDate.format(DateTimeFormatter.ofLocalizedDate(
+                            FormatStyle.MEDIUM))}")
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { gender = "men" },
+                            modifier = Modifier.weight(1f),
+                            colors = if (gender == "men") ButtonDefaults.buttonColors()
+                            else ButtonDefaults.filledTonalButtonColors()
+                        ) {
+                            Text("Men's")
+                        }
+
+                        Button(
+                            onClick = { gender = "women" },
+                            modifier = Modifier.weight(1f),
+                            colors = if (gender == "women") ButtonDefaults.buttonColors()
+                            else ButtonDefaults.filledTonalButtonColors()
+                        ) {
+                            Text("Women's")
+                        }
+                    }
+                }
             }
         }
     ) { padding ->
@@ -98,6 +156,33 @@ fun ScoreboardScreen(repository: GameRepo) {
                 items(games) { game ->
                     GameCard(game)
                 }
+            }
+        }
+
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState()
+
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            datePickerState.selectedDateMillis?.let { millis ->
+                                selectedDate = Instant.ofEpochMilli(millis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                            }
+                            showDatePicker = false
+                        }
+                    ) { Text("OK") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
             }
         }
     }
