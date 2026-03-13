@@ -20,6 +20,35 @@ import edu.nd.pmcburne.hwapp.one.data.api.RetrofitInstance
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycleScope.launch {
+
+            try {
+
+                val response = RetrofitInstance.api.getGameInfo(
+                    "men",
+                    "2026",
+                    "03",
+                    "12"
+                )
+
+                response.games.forEach {
+
+                    val game = it.game
+
+                    Log.d(
+                        "API_TEST",
+                        "${game.away.names.short} vs ${game.home.names.short} | " +
+                                "${game.away.score}-${game.home.score} | ${game.gameState}"
+                    )
+                }
+
+            } catch (e: Exception) {
+
+                Log.e("API_TEST", "API call failed", e)
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             HWStarterRepoTheme {
