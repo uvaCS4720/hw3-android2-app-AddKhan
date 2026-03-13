@@ -257,12 +257,12 @@ fun ScoreboardScreen(repository: GameRepo) {
 fun GameCard(game: GameEntity) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(horizontal = 12.dp, vertical = 6.dp)
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(25.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
