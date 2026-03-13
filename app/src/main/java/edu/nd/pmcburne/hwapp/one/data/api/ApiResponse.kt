@@ -1,5 +1,7 @@
 package edu.nd.pmcburne.hwapp.one.data.api
 
+import com.google.gson.annotations.SerializedName
+
 data class ApiResponse(
     val games: List<GameWrapper>
 )
@@ -9,7 +11,7 @@ data class GameWrapper(
 )
 
 data class Game(
-    val gameID: String,
+    @SerializedName("gameID") val gameId: String?,
     val gameState: String,
     val startTime: String,
     val currentPeriod: String,
