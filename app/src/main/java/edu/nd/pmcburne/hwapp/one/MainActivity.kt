@@ -57,6 +57,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.GlobalScope
 
@@ -143,11 +144,7 @@ fun ScoreboardScreen(repository: GameRepo) {
 
                         IconButton(
                             onClick = {
-                                // We manually trigger the refresh here
                                 isLoading = true
-                                // We use a coroutine scope to call the suspend function manually
-                                // Or simply let the LaunchedEffect handle it by "nudging" a state
-                                // But the cleanest way is to just call refreshGames:
                                 kotlinx.coroutines.GlobalScope.launch {
                                     repository.refreshGames(
                                         gender,
@@ -259,39 +256,42 @@ fun GameCard(game: GameEntity) {
         modifier = Modifier
             .padding(horizontal = 12.dp, vertical = 6.dp)
             .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(25.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(0.6f)) {
                 ScoreRow(teamName = "Away: ${game.awayTeam}", score = game.awayScore)
+                Spacer(modifier = Modifier.height(8.dp))
                 ScoreRow(teamName = "Home: ${game.homeTeam}", score = game.homeScore)
             }
 
-            Column(horizontalAlignment = Alignment.End) {
-                val displayStatus = when (game.status.lowercase()) {
-                    "pre" -> "Upcoming: ${game.startTime ?: "TBD"}"
-                    "final" -> "Final"
-                    "live" -> {
-                        "Currently Playing: ${game.clock ?: ""} ${game.period}"
-                    }
-                    else -> game.status
-                }
-
+            Column(
+                modifier = Modifier.weight(0.4f),
+                horizontalAlignment = Alignment.End
+            ) {
                 Text(
-                    text = displayStatus,
-                    style =  MaterialTheme.typography.labelLarge,
+                    text = when (game.status.lowercase()) {
+                        "pre" -> game.startTime ?: "TBD"
+                        "final" -> "Final"
+                        "live" -> "${game.clock ?: ""} P${game.period ?: ""}"
+                        else -> game.status.uppercase()
+                    },
+                    style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold
                 )
 
                 if (game.status.lowercase() == "final" && game.winner != null) {
                     Text(
                         text = "Winner: ${game.winner}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFF388E3C)
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF388E3C),
+                        textAlign = TextAlign.End
                     )
                 }
             }
@@ -301,14 +301,15 @@ fun GameCard(game: GameEntity) {
 
 @Composable
 fun ScoreRow(teamName: String, score: Int?) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    //Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = teamName,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.widthIn(min = 100.dp)
         )
         Text(
-            text = score?.toString() ?: "-",
+            text = "Score: ${score?.toString() ?: "-"}",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier.padding(start = 8.dp)
