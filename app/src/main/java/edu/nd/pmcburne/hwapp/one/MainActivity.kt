@@ -64,7 +64,9 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             AppDatabase::class.java,
             "ncaa-db"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
         val dao = db.gameDao()
 
@@ -147,15 +149,21 @@ fun ScoreboardScreen(repository: GameRepo) {
             }
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
+        Box(modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()) {
+//            if (isLoading) {
+//                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+//            }
 
             LazyColumn {
                 items(games) { game ->
                     GameCard(game)
                 }
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
         }
 
@@ -169,7 +177,7 @@ fun ScoreboardScreen(repository: GameRepo) {
                         onClick = {
                             datePickerState.selectedDateMillis?.let { millis ->
                                 selectedDate = Instant.ofEpochMilli(millis)
-                                    .atZone(ZoneId.systemDefault())
+                                    .atZone(ZoneId.of("UTC"))
                                     .toLocalDate()
                             }
                             showDatePicker = false
@@ -202,15 +210,17 @@ fun GameCard(game: GameEntity) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                ScoreRow(teamName = game.awayTeam, score = game.awayScore)
-                ScoreRow(teamName = game.homeTeam, score = game.homeScore)
+                ScoreRow(teamName = "Away: ${game.awayTeam}", score = game.awayScore)
+                ScoreRow(teamName = "Home: ${game.homeTeam}", score = game.homeScore)
             }
 
             Column(horizontalAlignment = Alignment.End) {
                 val displayStatus = when (game.status.lowercase()) {
-                    "pre" -> game.startTime ?: "TBD"
+                    "pre" -> "Upcoming: ${game.startTime ?: "TBD"}"
                     "final" -> "Final"
-                    "live" -> "${game.clock ?: ""} ${getPeriodText(game.period, game.gender)}"
+                    "live" -> {
+                        "Currently Playing: ${game.clock ?: ""} ${game.period}"
+                    }
                     else -> game.status
                 }
 
@@ -251,13 +261,13 @@ fun ScoreRow(teamName: String, score: Int?) {
 
 fun getPeriodText(period: Int?, gender: String): String {
     if (period == null) return ""
-    return when (gender.lowercase()) {
-        "men" -> when (period) {
+    return when {
+        gender.lowercase().contains("men") -> when (period) {
             1 -> "1st Half"
             2 -> "2nd Half"
-            else -> "OT$ {period - 2}"
+            else -> "OT${period - 2}"
         }
-        "women" -> when (period) {
+        gender.lowercase().contains("women") -> when (period) {
             in 1..4 -> "Q$period"
             else -> "OT${period - 4}"
         }
