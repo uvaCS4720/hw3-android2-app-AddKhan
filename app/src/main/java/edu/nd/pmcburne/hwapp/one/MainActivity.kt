@@ -156,10 +156,20 @@ fun ScoreboardScreen(repository: GameRepo) {
 //                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
 //            }
 
-            LazyColumn {
-                items(games) { game ->
-                    GameCard(game)
+            if (games.isNotEmpty()) {
+                LazyColumn {
+                    items(games) { game ->
+                        GameCard(game)
+                    }
                 }
+            }
+            else if (!isLoading) {
+                Text(
+                    text = "No game data available.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
 
             if (isLoading) {
