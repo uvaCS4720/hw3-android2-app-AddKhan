@@ -1,6 +1,7 @@
-package edu.nd.pmcburne.hwapp.one
+package edu.nd.pmcburne.hwapp.one.data.database
 
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity(tableName = "games")
 data class GameEntity(
