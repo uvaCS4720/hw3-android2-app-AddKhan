@@ -60,8 +60,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.GlobalScope
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -197,10 +195,6 @@ fun ScoreboardScreen(repository: GameRepo) {
         Box(modifier = Modifier
             .padding(padding)
             .fillMaxSize()) {
-//            if (isLoading) {
-//                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-//            }
-
             if (games.isNotEmpty()) {
                 LazyColumn {
                     items(games) { game ->
@@ -302,7 +296,6 @@ fun GameCard(game: GameEntity) {
 
 @Composable
 fun ScoreRow(teamName: String, score: Int?) {
-    //Row(verticalAlignment = Alignment.CenterVertically) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = teamName,
@@ -315,21 +308,5 @@ fun ScoreRow(teamName: String, score: Int?) {
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier.padding(start = 8.dp)
         )
-    }
-}
-
-fun getPeriodText(period: Int?, gender: String): String {
-    if (period == null) return ""
-    return when {
-        gender.lowercase().contains("men") -> when (period) {
-            1 -> "1st Half"
-            2 -> "2nd Half"
-            else -> "OT${period - 2}"
-        }
-        gender.lowercase().contains("women") -> when (period) {
-            in 1..4 -> "Q$period"
-            else -> "OT${period - 4}"
-        }
-        else -> "P$period"
     }
 }
