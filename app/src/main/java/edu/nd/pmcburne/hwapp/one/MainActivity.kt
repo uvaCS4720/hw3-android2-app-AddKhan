@@ -278,8 +278,8 @@ fun GameCard(game: GameEntity) {
                 Text(
                     text = when (game.status.lowercase()) {
                         "pre" -> game.startTime ?: "TBD"
-                        "final" -> "Final"
-                        "live" -> "${game.clock ?: ""} P${game.period ?: ""}"
+                        "final" -> "FINAL"
+                        "live" -> "${game.clock ?: ""} P - ${game.currentPeriod ?: ""}"
                         else -> game.status.uppercase()
                     },
                     style = MaterialTheme.typography.labelLarge,

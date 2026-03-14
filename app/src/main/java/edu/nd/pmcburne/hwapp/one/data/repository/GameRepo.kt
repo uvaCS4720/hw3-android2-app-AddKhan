@@ -26,7 +26,7 @@ class GameRepo(private val dao: GameDao) {
                     startTime = g.startTime,
                     homeScore = g.home.score?.toIntOrNull(),
                     awayScore = g.away.score?.toIntOrNull(),
-                    period = g.currentPeriod.toIntOrNull(),
+                    currentPeriod = g.currentPeriod,
                     clock = g.contestClock,
                     winner = if (g.gameState == "final") {
                         if (g.home.winner) g.home.names.short else g.away.names.short
