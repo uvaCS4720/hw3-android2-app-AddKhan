@@ -20,7 +20,7 @@ data class GameEntity(
     val homeScore: Int?,
     val awayScore: Int?,
 
-    val period: Int?,
+    val currentPeriod: String,
     val clock: String?,
 
     val winner: String?
