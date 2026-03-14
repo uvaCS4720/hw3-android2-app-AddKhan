@@ -57,6 +57,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.GlobalScope
@@ -89,10 +90,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ScoreboardScreen(repository: GameRepo) {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var gender by remember { mutableStateOf("men") }
-    var showDatePicker by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    var selectedDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
+    var gender by rememberSaveable { mutableStateOf("men") }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
 
     val dateString = selectedDate.toString()
     val games by repository.getGames(dateString, gender).collectAsState(initial = emptyList())
